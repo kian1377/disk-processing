@@ -1,8 +1,8 @@
-#   Copyright 2020 California Institute of Technology
+#   Copyright 2021 California Institute of Technology
 # ------------------------------------------------------------------
-#
+
 # PUBLIC RELEASE VERSION (no ITAR error maps)
-#
+
 # Version 0.9, 15 June 2020, John Krist; beta-test version for mask evaluation
 # Version 0.9.1, 29 June 2020, John Krist; rotated SPC pupils & Lyot stops 
 # Version 0.9.2, 7 July 2020, John Krist; updated HLC occulters
@@ -24,10 +24,21 @@
 #     retrieval lenses used; use OAP6 aperture when pinhole is specified
 # Version 1.2.3, 15 July 2021, John Krist: added dm_sampling_m as optional parameter
 # Version 1.2.4, 3 Aug 2021, John Krist: added HLC FPM files for band 3g 
-
-# experience has shown that with the Intel math libraries the program
+# Version 1.2.5, 20 Sept 2021, John Krist: added use_lens_errors parameter, 
+#                 updated defocus and PIL error maps; added facility for separate error maps for each 
+#                 lens in to_from_doublet 
+# Version 1.2.6, 7 Oct 2021, John Krist: added save_ref_radius to optional parameters, used for phase 
+#                 retrieval studies in conjuction with CGISim (Python only); this value is only valid 
+#                 if propagation ends at the detector
+# Version 1.2.7, 21 Oct 2021, John Krist: if SPC and use_pupil_mask eq 0, then use fold mirror 
+#                 errors rather than SPC substrate errors
+# Version 1.2.8, 11 Nov 2021, John Krist: Added option for spc-spec_band2_rotated; fixed rotated SPC
+#                 mask orientations 
+  
+# Experience has shown that with the Intel math libraries the program
 # can hang if run in a multithreaded condition with more than one 
 # thread allocated, so set to 1. This must be done before importing numpy
+
 import os
 os.environ['MKL_NUM_THREADS'] = '1'
 import numpy as np
@@ -80,7 +91,7 @@ def to_from_singlet( wavefront, dz_to_lens, dz_from_lens, r1, r2, thickness, ngl
 
 ###############################################################################33
 def to_from_doublet( wavefront, dz_to_lens, dz_from_lens, r1_a, r2_a, thickness_a, nglass_a, separation_m, 
-    r1_b, r2_b, thickness_b, nglass_b, surface_name, next_surface_name, ERROR_MAP_FILE=' ', TO_PLANE=0):
+    r1_b, r2_b, thickness_b, nglass_b, surface_name, next_surface_name, ERROR_MAP_FILES=' ', TO_PLANE=0):
 
     # two air-gapped thick lenses (lenses a & b)
 
@@ -94,10 +105,13 @@ def to_from_doublet( wavefront, dz_to_lens, dz_from_lens, r1_a, r2_a, thickness_
 
     proper.prop_propagate( wavefront, dz_to_lens+h1_a, surface_name )
     proper.prop_lens( wavefront, f_a, surface_name+' lens #1' )
-    if ERROR_MAP_FILE != ' ':
-        proper.prop_errormap( wavefront, ERROR_MAP_FILE, WAVEFRONT=True )
+    if ERROR_MAP_FILES != ' ':
+        proper.prop_errormap( wavefront, ERROR_MAP_FILES[0], WAVEFRONT=True )
     proper.prop_propagate( wavefront, -h2_a+separation_m+h1_b )
     proper.prop_lens( wavefront, f_b, surface_name+' lens #2' )
+    if ERROR_MAP_FILES != ' ':
+        if ERROR_MAP_FILES[1] != ' ':
+            proper.prop_errormap( wavefront, ERROR_MAP_FILES[1], WAVEFRONT=True )
     proper.prop_propagate( wavefront, -h2_b+dz_from_lens, next_surface_name, TO_PLANE=TO_PLANE )
 
     return
@@ -193,12 +207,14 @@ def roman_phasec( lambda_m, output_dim0, PASSVALUE={'dummy':0} ):
     field_stop_y_offset = 0
     field_stop_x_offset_m = 0   # field stop offset in meters
     field_stop_y_offset_m = 0
+    use_lens_errors = 1         # apply lens errors (1=yes)? Overrides whatever use_errors is set to
     use_pupil_lens = 0          # use pupil imaging lens? 0 or 1
     use_defocus_lens = 0        # use defocusing lens? Options are 1, 2, 3, 4
     end_at_exit_pupil = 0       # return exit pupil corresponding to final image plane
     final_sampling_m = 0        # final sampling in meters (overrides final_sampling_lam0)
     final_sampling_lam0 = 0     # final sampling in lambda0/D
     output_dim = output_dim0    # dimension of output in pixels (overrides output_dim0)
+    save_ref_radius = 0
 
     if 'PASSVALUE' in locals():
         if 'cor_type' in PASSVALUE: cor_type = PASSVALUE['cor_type']
@@ -288,17 +304,20 @@ def roman_phasec( lambda_m, output_dim0, PASSVALUE={'dummy':0} ):
         else:
             n = 2048
         n_mft = 1400                # gridsize to FPM (propagation to/from FPM handled by MFT)
-    elif cor_type == 'spc-spec_rotated':
+    elif cor_type == 'spc-spec_rotated' or cor_type == 'spc-spec_band2_rotated' or cor_type == 'spc-spec_band3_rotated':
         is_spc = True
         file_dir = data_dir + '/spc_20200628_specrot/'     # must have trailing "/"
         pupil_diam_pix = 1000.0     # Y axis pupil diameter in pixels
         pupil_file = file_dir + 'pupil_SPC-20200628_1000.fits'
-        pupil_mask_file = file_dir + 'SPM_SPC-20200628_1000_derotated_rotated.fits'
+        pupil_mask_file = file_dir + 'SPM_SPC-20200628_1000_rotated.fits'
         fpm_sampling_lam0divD = 0.05         # sampling in fpm_lam0_m/D of FPM mask 
-        fpm_file = file_dir + 'FPM_SPC-20200628_res20.fits'
-        fpm_lam0_m = 0.73e-6
+        fpm_file = file_dir + 'FPM_SPC-20200628_res20_flip.fits'
+        if cor_type == 'spc-spec_band2_rotated':
+            fpm_lam0_m = 0.66e-6
+        else:
+            fpm_lam0_m = 0.73e-6
         lambda0_m = fpm_lam0_m     # FPM scaled for this central wavelength
-        lyot_stop_file = file_dir + 'LS_SPC-20200628_1000.fits'
+        lyot_stop_file = file_dir + 'LS_SPC-20200628_1000_flip.fits'
         if use_defocus_lens != 0 or use_pupil_lens != 0:
             n = 4096
         else:
@@ -367,6 +386,7 @@ def roman_phasec( lambda_m, output_dim0, PASSVALUE={'dummy':0} ):
         if 'source_y_offset_mas' in PASSVALUE: source_y_offset = PASSVALUE['source_y_offset_mas'] / mas_per_lamD
         if 'use_aperture' in PASSVALUE: use_aperture = PASSVALUE['use_aperture']
         if 'use_errors' in PASSVALUE: use_errors = PASSVALUE['use_errors']
+        use_lens_errors = use_errors
         if 'use_pupil_defocus' in PASSVALUE: use_pupil_defocus = PASSVALUE['use_pupil_defocus']
         if 'polaxis' in PASSVALUE: polaxis = PASSVALUE['polaxis'] 
         if 'zindex' in PASSVALUE: zindex = np.array( PASSVALUE['zindex'] )
@@ -394,8 +414,8 @@ def roman_phasec( lambda_m, output_dim0, PASSVALUE={'dummy':0} ):
         if 'fsm_y_offset_mas' in PASSVALUE: fsm_y_offset = PASSVALUE['fsm_y_offset_mas'] / mas_per_lamD
         if 'focm_z_shift_m' in PASSVALUE: focm_z_shift_m = PASSVALUE['focm_z_shift_m']
         if 'use_hlc_dm_patterns' in PASSVALUE: use_hlc_dm_patterns = PASSVALUE['use_hlc_dm_patterns']
-        if 'dm_sampling_m' in PASSVALUE: dm_sampling_m = PASSVALUE['dm_sampling_m']
         if 'use_dm1' in PASSVALUE: use_dm1 = PASSVALUE['use_dm1'] 
+        if 'dm_sampling_m' in PASSVALUE: dm_sampling_m = PASSVALUE['dm_sampling_m']
         if 'dm1_m' in PASSVALUE: dm1_m = PASSVALUE['dm1_m']
         if 'dm1_xc_act' in PASSVALUE: dm1_xc_act = PASSVALUE['dm1_xc_act']
         if 'dm1_yc_act' in PASSVALUE: dm1_yc_act = PASSVALUE['dm1_yc_act']
@@ -456,6 +476,7 @@ def roman_phasec( lambda_m, output_dim0, PASSVALUE={'dummy':0} ):
         if 'field_stop_y_offset' in PASSVALUE: field_stop_y_offset = PASSVALUE['field_stop_y_offset']
         if 'field_stop_x_offset_m' in PASSVALUE: field_stop_x_offset_m = PASSVALUE['field_stop_x_offset_m']
         if 'field_stop_y_offset_m' in PASSVALUE: field_stop_y_offset_m = PASSVALUE['field_stop_y_offset_m']
+        if 'use_lens_errors' in PASSVALUE: use_lens_errors = PASSVALUE['use_lens_errors']
         if 'end_at_exit_pupil' in PASSVALUE: end_at_exit_pupil = PASSVALUE['end_at_exit_pupil']
         if 'final_sampling_lam0' in PASSVALUE and 'final_sampling_m' in PASSVALUE:
             print("ERROR: can only specify final_sampling_lam0 or final_sampling_m, not both")
@@ -463,6 +484,7 @@ def roman_phasec( lambda_m, output_dim0, PASSVALUE={'dummy':0} ):
         if 'final_sampling_lam0' in PASSVALUE: final_sampling_lam0 = PASSVALUE['final_sampling_lam0']
         if 'final_sampling_m' in PASSVALUE: final_sampling_m = PASSVALUE['final_sampling_m']
         if 'output_dim' in PASSVALUE: output_dim = PASSVALUE['output_dim']
+        if 'save_ref_radius' in PASSVALUE: save_ref_radius = PASSVALUE['save_ref_radius']
 
     if use_hlc_dm_patterns != 0 and cor_type != 'hlc' and cor_type != 'hlc_band1':
         raise Exception('ERROR: Can only utilize use_hlc_dm_patterns with Band 1 HLC')
@@ -719,7 +741,7 @@ def roman_phasec( lambda_m, output_dim0, PASSVALUE={'dummy':0} ):
         proper.prop_multiply( wavefront, pupil_mask )
         pupil_mask = 0
     if use_errors != 0: 
-        if is_spc == 1:
+        if is_spc == 1 and use_pupil_mask != 0:
             proper.prop_errormap( wavefront, map_dir+'roman_phasec_PUPILMASK_phase_error_V1.0.fits', WAVEFRONT=True )
         else:
             proper.prop_errormap( wavefront, map_dir+'roman_phasec_PUPILFOLD_phase_error_V1.0.fits', WAVEFRONT=True )
@@ -905,29 +927,29 @@ def roman_phasec( lambda_m, output_dim0, PASSVALUE={'dummy':0} ):
 
     if use_pupil_lens == 0 and use_defocus_lens == 0:
         # use imaging lens to create normal focus
-        if use_errors != 0:
-            imaging_lens_error_file = map_dir + 'roman_phasec_LENS_phase_error_V1.0.fits'
+        if use_lens_errors != 0:
+            imaging_lens_error_files = [map_dir+'roman_phasec_LENS_phase_error_V1.0.fits', ' ']
         else:
-            imaging_lens_error_file = ' '
+            imaging_lens_error_files = ' '
         to_from_doublet( wavefront, d_filter_lens, d_lens_fold4+d_fold4_image, 
                 0.10792660718579995, -0.10792660718579995, 0.003, glass_index('S-BSL7R', lambda_m, data_dir), 0.0005, 
                 1e10, 0.10608379812011390, 0.0025, glass_index('PBM2R', lambda_m, data_dir), 
-                'IMAGING LENS', 'IMAGE', ERROR_MAP_FILE=imaging_lens_error_file, TO_PLANE=1 )
+                'IMAGING LENS', 'IMAGE', ERROR_MAP_FILES=imaging_lens_error_files, TO_PLANE=1 )
     elif use_pupil_lens != 0:
         # use pupil imaging lens
-        if use_errors != 0:
-            pupil_lens_error_file = map_dir + 'roman_phasec_PUPILLENS_phase_error_V1.0.fits'
+        if use_lens_errors != 0:
+            pupil_lens_error_files = [ map_dir+'roman_phasec_PUPIL_IMAGE_LENS1_measured_phase_error_V2.0.fits', map_dir+'roman_phasec_PUPIL_IMAGE_LENS2_measured_phase_error_V2.0.fits']
         else:
-            pupil_lens_error_file = ' '
+            pupil_lens_error_files = ' '
         to_from_doublet( wavefront, d_filter_lens, d_lens_fold4+d_fold4_image, 
                 0.03449714, -0.20846556, 0.003, glass_index('S-BSL7R', lambda_m, data_dir), 0.0007, 
                 1e10, 0.05453792, 0.0025, glass_index('PBM2R', lambda_m, data_dir), 
-                'PUPIL IMAGING LENS', 'IMAGE', ERROR_MAP_FILE=pupil_lens_error_file, TO_PLANE=0 )
+                'PUPIL IMAGING LENS', 'IMAGE', ERROR_MAP_FILES=pupil_lens_error_files, TO_PLANE=0 )
     elif use_defocus_lens != 0:     
         # use one of 4 defocusing lenses
         c_lens = [0.01325908247149297, 0.01243982235933671, 0.01163480668768688, 0.005663476241717166]
-        if use_errors != 0:
-            defocus_lens_error_file = map_dir+'roman_phasec_DEFOCUSLENS' + str(use_defocus_lens) + '_phase_error_V1.0.fits'
+        if use_lens_errors != 0:
+            defocus_lens_error_file = map_dir+'roman_phasec_DEFOCUSLENS' + str(use_defocus_lens) + '_measured_phase_error_V2.0.fits'
         else:
             defocus_lens_error_file = ' '
         to_from_singlet( wavefront, d_filter_lens, d_lens_fold4+d_fold4_image, 
@@ -941,6 +963,17 @@ def roman_phasec( lambda_m, output_dim0, PASSVALUE={'dummy':0} ):
         proper.prop_propagate( wavefront, 0.0882 )
     elif use_defocus_lens == 0 and use_pupil_lens == 0:
         rsqr = proper.prop_radius( wavefront )**2 
+
+    if end_at_exit_pupil == 0:
+        if 'PASSVALUE' in locals():
+            if 'save_ref_radius' in PASSVALUE:
+                # save_ref_radius is an integer >0; if defined, it will create a file
+                # 'ref_radius_#.dat', where # is replaced with the value of save_ref_radius.
+                # It will write out the wavefront reference radius in binary form. This is
+                # used during phase retrieval studies using CGISim 
+                fname = 'ref_radius_' + str(save_ref_radius) + '.dat'
+                with open( fname, "wb" ) as file1: 
+                    np.array( proper.prop_get_refradius(wavefront), dtype=float ).tofile(file1)
 
     (wavefront, sampling_m) = proper.prop_end( wavefront, NOABS=True )
 

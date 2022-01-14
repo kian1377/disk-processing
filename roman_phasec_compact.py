@@ -1,25 +1,26 @@
-#   Copyright 2020 California Institute of Technology
+#   Copyright 2021 California Institute of Technology
 # ------------------------------------------------------------------
-#
-# PUBLIC RELEASE VERSION (no ITAR error maps)
-#
+
 # Version 0.9, 15 June 2020, John Krist; beta-test version for mask evaluation
 # Version 0.9.1, 29 June 2020, John Krist; rotated SPC pupils & Lyot stops 
 # Version 0.9.2, 7 July 2020, John Krist; updated HLC occulters
 # Version 1.0, 1.0.1, 15 Sept 2020, John Krist: updated HLC
 # Version 1.1, 3 Dec 2020, John Krist: added field-dependent phase term at image
 #     plane to match E-field from full model due to pupil offset
-# Version 1.2, 2 Feg 2021, John Krist: switched to using MFTs to propagate to/from HLC FPM;
+# Version 1.2, 2 Feb 2021, John Krist: switched to using MFTs to propagate to/from HLC FPM;
 #     updated the list of available HLC FPM wavelengths; removed field-dependent phase term 
 #     (now subtracting it from the full model instead); read in list of available HLC FPM files;
 #     added spc-mswc mode; added modes to allow spc-wide or spc-mswc to use band 1;
 #     removed the input_field_rootname and polaxis options; added HLCs for bands 2-4; added
 #     rotated SPC
 # Version 1.2.3, 15 July 2021, John Krist: added dm_sampling_m as optional parameter
+# Version 1.2.8, 11 Nov 2021, John Krist: Added option for spc-spec_band2_rotated; fixed rotated SPC
+#     mask orientations
 
 # experience has shown that with the Intel math libraries the program
 # can hang if run in a multithreaded condition with more than one 
 # thread allocated, so set to 1. This must be done before importing numpy
+
 import os
 os.environ['MKL_NUM_THREADS'] = '1' 
 import numpy as np
@@ -137,20 +138,23 @@ def roman_phasec_compact( lambda_m, output_dim0, PASSVALUE={'dummy':0} ):
         else:
             fpm_lam0_m = 0.73e-6
         lambda0_m = fpm_lam0_m 
-        lyot_stop_file = file_dir + 'LS_SPC-20200617_500.fits'
+        lyot_stop_file = file_dir + 'LS_SPC-20200617_1000.fits'
         n_small = 2048              # gridsize in non-critical areas
         n_big = 1400                # gridsize to FPM (propagation to/from FPM handled by MFT)
-    elif cor_type == 'spc-spec_rotated':
+    elif cor_type == 'spc-spec_rotated' or cor_type == 'spc-spec_band2_rotated' or cor_type == 'spc-spec_band3_rotated':
         is_spc = True
         file_dir = data_dir + '/spc_20200628_specrot/'  # must have trailing "/"
         pupil_diam_pix = 1000.0     # Y axis pupil diameter in pixels
         pupil_file = file_dir + 'pupil_SPC-20200628_1000.fits'
-        pupil_mask_file = file_dir + 'SPM_SPC-20200628_1000_derotated.fits'
+        pupil_mask_file = file_dir + 'SPM_SPC-20200628_1000.fits'
         fpm_sampling = 0.05    # sampling in lambda0/D of FPM mask 
-        fpm_file = file_dir + 'FPM_SPC-20200628_res20.fits'
-        fpm_lam0_m = 0.73e-6
+        fpm_file = file_dir + 'FPM_SPC-20200628_res20_flip.fits'
+        if cor_type == 'spc-spec_band2_rotated':
+            fpm_lam0_m = 0.66e-6
+        else:
+            fpm_lam0_m = 0.73e-6
         lambda0_m = fpm_lam0_m 
-        lyot_stop_file = file_dir + 'LS_SPC-20200628_1000.fits'
+        lyot_stop_file = file_dir + 'LS_SPC-20200628_1000_flip.fits'
         n_small = 2048              # gridsize in non-critical areas
         n_big = 1400                # gridsize to FPM (propagation to/from FPM handled by MFT)
     elif cor_type == 'spc-wide' or cor_type == 'spc-wide_band4' or cor_type == 'spc-wide_band1':
@@ -166,7 +170,7 @@ def roman_phasec_compact( lambda_m, output_dim0, PASSVALUE={'dummy':0} ):
         else:
             fpm_lam0_m = 0.825e-6
         lambda0_m = fpm_lam0_m        # FPM scaled for this central wavelength
-        lyot_stop_file = file_dir + 'LS_SPC-20200610_500.fits'
+        lyot_stop_file = file_dir + 'LS_SPC-20200610_1000.fits'
         n_small = 2048              # gridsize in non-critical areas
         n_big = 1400                # gridsize to FPM (propagation to/from FPM handled by MFT)
     elif cor_type == 'spc-mswc':
@@ -175,7 +179,7 @@ def roman_phasec_compact( lambda_m, output_dim0, PASSVALUE={'dummy':0} ):
         pupil_diam_pix = 982.0                           # Y axis pupil diameter in pixels
         pupil_file = file_dir + 'pupil_SPC-20200623_982_rotated.fits'
         pupil_mask_file = file_dir + 'SPM_SPC-20200623_982_rounded9_gray.fits'
-        fpm_sampling_lam0divD = 0.1    # sampling in lambda0/D of FPM mask 
+        fpm_sampling = 0.1    # sampling in lambda0/D of FPM mask 
         fpm_file = file_dir + 'FPM_SPC-20200623_0.1_lamc_div_D.fits'
         if cor_type == 'spc-mswc_band1':
             fpm_lam0_m = 0.575e-6
@@ -192,8 +196,8 @@ def roman_phasec_compact( lambda_m, output_dim0, PASSVALUE={'dummy':0} ):
         if 'source_x_offset' in PASSVALUE: source_x_offset = PASSVALUE['source_x_offset']
         if 'source_y_offset' in PASSVALUE: source_y_offset = PASSVALUE['source_y_offset']
         if 'use_hlc_dm_patterns' in PASSVALUE: use_hlc_dm_patterns = PASSVALUE['use_hlc_dm_patterns']
-        if 'dm_sampling_m' in PASSVALUE: dm_sampling_m = PASSVALUE['dm_sampling_m']
         if 'use_dm1' in PASSVALUE: use_dm1 = PASSVALUE['use_dm1'] 
+        if 'dm_sampling_m' in PASSVALUE: dm_sampling_m = PASSVALUE['dm_sampling_m']
         if 'dm1_m' in PASSVALUE: dm1_m = PASSVALUE['dm1_m']
         if 'dm1_xc_act' in PASSVALUE: dm1_xc_act = PASSVALUE['dm1_xc_act']
         if 'dm1_yc_act' in PASSVALUE: dm1_yc_act = PASSVALUE['dm1_yc_act']
@@ -285,8 +289,7 @@ def roman_phasec_compact( lambda_m, output_dim0, PASSVALUE={'dummy':0} ):
             wavefront = mft2(wavefront, fpm_sampling_lam, pupil_diam_pix, nfpm, +1)   # MFT to highly-sampled focal plane
             wavefront *= fpm
             fpm = 0
-            pupil_diam_pix = pupil_diam_pix / 2.0   # Shrink pupil by 1/2
-            wavefront = mft2(wavefront, fpm_sampling_lam, pupil_diam_pix, int(pupil_diam_pix), -1)  # MFT to Lyot stop with 1/2 magnification
+            wavefront = mft2(wavefront, fpm_sampling_lam, pupil_diam_pix, int(pupil_diam_pix), -1)  # MFT to Lyot stop 
 
     n = n_small
     wavefront = trim(wavefront,n)
