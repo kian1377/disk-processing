@@ -6,8 +6,8 @@ import time
 from pathlib import Path
 
 import proper
-# proper.prop_use_fftw()
-# proper.prop_fftw_wisdom( 2048 ) 
+proper.prop_use_fftw(DISABLE=False)
+proper.prop_fftw_wisdom( 1024 ) 
 
 import roman_phasec_proper
 roman_phasec_proper.copy_here()
@@ -30,7 +30,6 @@ psf_pixelscale_lamD = 0.1
 psf_pixelscale_mas = psf_pixelscale_lamD*mas_per_lamD/u.pix
 
 polaxis = 10
-
 
 iwa = 2.8
 owa = 9.7
@@ -64,7 +63,6 @@ r_offsets_hdu.writeto(r_offsets_fpath, overwrite=True)
 thetas_hdu = fits.PrimaryHDU(data=thetas.value)
 thetas_fpath = data_dir/'psfs'/'psf_theta_samples.fits'
 thetas_hdu.writeto(thetas_fpath, overwrite=True)
-
 
 nlam = 1
 lam0 = 0.575
