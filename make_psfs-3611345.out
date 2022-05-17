@@ -1,0 +1,144 @@
+no change     /home/u21/kianmilani/anaconda3/condabin/conda
+no change     /home/u21/kianmilani/anaconda3/bin/conda
+no change     /home/u21/kianmilani/anaconda3/bin/conda-env
+no change     /home/u21/kianmilani/anaconda3/bin/activate
+no change     /home/u21/kianmilani/anaconda3/bin/deactivate
+no change     /home/u21/kianmilani/anaconda3/etc/profile.d/conda.sh
+no change     /home/u21/kianmilani/anaconda3/etc/fish/conf.d/conda.fish
+no change     /home/u21/kianmilani/anaconda3/shell/condabin/Conda.psm1
+no change     /home/u21/kianmilani/anaconda3/shell/condabin/conda-hook.ps1
+no change     /home/u21/kianmilani/anaconda3/lib/python3.7/site-packages/xontrib/conda.xsh
+no change     /home/u21/kianmilani/anaconda3/etc/profile.d/conda.csh
+no change     /home/u21/kianmilani/.bashrc
+No action taken.
+Computing wisdom for 8 threads
+Computing wisdom for 1 threads
+(290,) [ 0.    0.05  0.1   0.15  0.2   0.25  0.3   0.35  0.4   0.45  0.5   0.55
+  0.6   0.65  0.7   0.75  0.8   0.85  0.9   0.95  1.    1.05  1.1   1.15
+  1.2   1.25  1.3   1.35  1.4   1.45  1.5   1.55  1.6   1.65  1.7   1.75
+  1.8   1.85  1.9   1.95  2.    2.05  2.1   2.15  2.2   2.25  2.3   2.35
+  2.4   2.45  2.5   2.55  2.6   2.65  2.7   2.75  2.8   2.85  2.9   2.95
+  3.    3.05  3.1   3.15  3.2   3.25  3.3   3.35  3.4   3.45  3.5   3.55
+  3.6   3.65  3.7   3.75  3.8   3.85  3.9   3.95  4.    4.05  4.1   4.15
+  4.2   4.25  4.3   4.35  4.4   4.45  4.5   4.55  4.6   4.65  4.7   4.75
+  4.8   4.85  4.9   4.95  5.    5.05  5.1   5.15  5.2   5.25  5.3   5.35
+  5.4   5.45  5.5   5.55  5.6   5.65  5.7   5.75  5.8   5.85  5.9   5.95
+  6.    6.05  6.1   6.15  6.2   6.25  6.3   6.35  6.4   6.5   6.6   6.7
+  6.8   6.9   7.    7.1   7.2   7.3   7.4   7.5   7.6   7.7   7.8   7.9
+  8.    8.1   8.2   8.3   8.4   8.5   8.6   8.7   8.8   8.9   9.    9.1
+  9.2   9.3   9.4   9.5   9.6   9.7   9.8   9.9  10.   10.1  10.2  10.3
+ 10.4  10.5  10.6  10.7  10.8  10.9  11.   11.1  11.2  11.3  11.4  11.5
+ 11.6  11.7  11.8  11.9  12.   12.1  12.2  12.3  12.4  12.5  12.6  12.7
+ 12.8  12.9  13.   13.1  13.2  13.3  13.4  13.5  13.6  13.7  13.8  13.9
+ 14.   14.1  14.2  14.3  14.4  14.5  14.6  14.7  14.8  14.9  15.   15.1
+ 15.2  15.3  15.4  15.5  15.6  15.7  15.8  15.9  16.   16.1  16.2  16.3
+ 16.4  16.5  16.6  16.7  16.8  16.9  17.   17.1  17.2  17.3  17.4  17.5
+ 17.6  17.7  17.8  17.9  18.   18.1  18.2  18.3  18.4  18.5  18.6  18.7
+ 18.8  18.9  19.   19.1  19.2  19.3  19.4  19.5  19.6  19.7  19.8  19.9
+ 20.   20.2  20.4  20.6  20.8  21.   21.2  21.4  21.6  21.8  22.   22.2
+ 22.4  22.6  22.8  23.   23.2  23.4  23.6  23.8  24.   24.2  24.4  24.6
+ 24.8  25.  ]
+(24,) [  0.  15.  30.  45.  60.  75.  90. 105. 120. 135. 150. 165. 180. 195.
+ 210. 225. 240. 255. 270. 285. 300. 315. 330. 345.] deg
+6960 3.64904448 32.86666666666667
+Iteration 0: PSFs for radial offset of 0.000 calculated in 52.971s.
+Iteration 1: PSFs for radial offset of 0.050 calculated in 110.678s.
+Iteration 2: PSFs for radial offset of 0.100 calculated in 169.123s.
+Iteration 3: PSFs for radial offset of 0.150 calculated in 227.101s.
+Iteration 4: PSFs for radial offset of 0.200 calculated in 285.079s.
+Iteration 5: PSFs for radial offset of 0.250 calculated in 343.426s.
+Iteration 6: PSFs for radial offset of 0.300 calculated in 401.966s.
+Iteration 7: PSFs for radial offset of 0.350 calculated in 460.034s.
+Iteration 8: PSFs for radial offset of 0.400 calculated in 517.796s.
+Iteration 9: PSFs for radial offset of 0.450 calculated in 575.562s.
+Iteration 10: PSFs for radial offset of 0.500 calculated in 633.017s.
+Iteration 11: PSFs for radial offset of 0.550 calculated in 691.111s.
+Iteration 12: PSFs for radial offset of 0.600 calculated in 749.702s.
+Iteration 13: PSFs for radial offset of 0.650 calculated in 808.749s.
+Iteration 14: PSFs for radial offset of 0.700 calculated in 867.263s.
+Iteration 15: PSFs for radial offset of 0.750 calculated in 925.589s.
+Iteration 16: PSFs for radial offset of 0.800 calculated in 982.676s.
+Iteration 17: PSFs for radial offset of 0.850 calculated in 1040.323s.
+Iteration 18: PSFs for radial offset of 0.900 calculated in 1097.687s.
+Iteration 19: PSFs for radial offset of 0.950 calculated in 1154.637s.
+Iteration 20: PSFs for radial offset of 1.000 calculated in 1212.882s.
+Iteration 21: PSFs for radial offset of 1.050 calculated in 1270.632s.
+Iteration 22: PSFs for radial offset of 1.100 calculated in 1328.723s.
+Iteration 23: PSFs for radial offset of 1.150 calculated in 1385.612s.
+Iteration 24: PSFs for radial offset of 1.200 calculated in 1443.481s.
+Iteration 25: PSFs for radial offset of 1.250 calculated in 1500.469s.
+Iteration 26: PSFs for radial offset of 1.300 calculated in 1558.379s.
+Iteration 27: PSFs for radial offset of 1.350 calculated in 1615.475s.
+Iteration 28: PSFs for radial offset of 1.400 calculated in 1673.198s.
+Iteration 29: PSFs for radial offset of 1.450 calculated in 1730.072s.
+Iteration 30: PSFs for radial offset of 1.500 calculated in 1788.256s.
+Iteration 31: PSFs for radial offset of 1.550 calculated in 1845.989s.
+Iteration 32: PSFs for radial offset of 1.600 calculated in 1904.184s.
+Iteration 33: PSFs for radial offset of 1.650 calculated in 1961.797s.
+Iteration 34: PSFs for radial offset of 1.700 calculated in 2020.536s.
+Iteration 35: PSFs for radial offset of 1.750 calculated in 2078.509s.
+Iteration 36: PSFs for radial offset of 1.800 calculated in 2135.997s.
+Iteration 37: PSFs for radial offset of 1.850 calculated in 2194.153s.
+Iteration 38: PSFs for radial offset of 1.900 calculated in 2252.234s.
+Iteration 39: PSFs for radial offset of 1.950 calculated in 2309.846s.
+Iteration 40: PSFs for radial offset of 2.000 calculated in 2367.922s.
+Iteration 41: PSFs for radial offset of 2.050 calculated in 2426.335s.
+Iteration 42: PSFs for radial offset of 2.100 calculated in 2484.783s.
+Iteration 43: PSFs for radial offset of 2.150 calculated in 2542.532s.
+Iteration 44: PSFs for radial offset of 2.200 calculated in 2600.623s.
+Iteration 45: PSFs for radial offset of 2.250 calculated in 2657.784s.
+Iteration 46: PSFs for radial offset of 2.300 calculated in 2715.655s.
+Iteration 47: PSFs for radial offset of 2.350 calculated in 2773.144s.
+Iteration 48: PSFs for radial offset of 2.400 calculated in 2831.230s.
+Iteration 49: PSFs for radial offset of 2.450 calculated in 2888.217s.
+Iteration 50: PSFs for radial offset of 2.500 calculated in 2946.233s.
+Iteration 51: PSFs for radial offset of 2.550 calculated in 3003.955s.
+Iteration 52: PSFs for radial offset of 2.600 calculated in 3061.781s.
+Iteration 53: PSFs for radial offset of 2.650 calculated in 3119.281s.
+Iteration 54: PSFs for radial offset of 2.700 calculated in 3178.034s.
+Iteration 55: PSFs for radial offset of 2.750 calculated in 3234.899s.
+Iteration 56: PSFs for radial offset of 2.800 calculated in 3292.481s.
+Iteration 57: PSFs for radial offset of 2.850 calculated in 3349.441s.
+Iteration 58: PSFs for radial offset of 2.900 calculated in 3407.230s.
+Iteration 59: PSFs for radial offset of 2.950 calculated in 3464.409s.
+Iteration 60: PSFs for radial offset of 3.000 calculated in 3522.680s.
+Iteration 61: PSFs for radial offset of 3.050 calculated in 3580.319s.
+Iteration 62: PSFs for radial offset of 3.100 calculated in 3637.539s.
+Iteration 63: PSFs for radial offset of 3.150 calculated in 3695.181s.
+Iteration 64: PSFs for radial offset of 3.200 calculated in 3753.119s.
+Iteration 65: PSFs for radial offset of 3.250 calculated in 3810.086s.
+Iteration 66: PSFs for radial offset of 3.300 calculated in 3868.366s.
+Iteration 67: PSFs for radial offset of 3.350 calculated in 3926.328s.
+Iteration 68: PSFs for radial offset of 3.400 calculated in 3984.483s.
+Iteration 69: PSFs for radial offset of 3.450 calculated in 4041.900s.
+Iteration 70: PSFs for radial offset of 3.500 calculated in 4100.560s.
+Iteration 71: PSFs for radial offset of 3.550 calculated in 4158.406s.
+Iteration 72: PSFs for radial offset of 3.600 calculated in 4216.278s.
+Iteration 73: PSFs for radial offset of 3.650 calculated in 4274.528s.
+Iteration 74: PSFs for radial offset of 3.700 calculated in 4333.068s.
+Iteration 75: PSFs for radial offset of 3.750 calculated in 4390.839s.
+Iteration 76: PSFs for radial offset of 3.800 calculated in 4449.097s.
+Iteration 77: PSFs for radial offset of 3.850 calculated in 4506.879s.
+Iteration 78: PSFs for radial offset of 3.900 calculated in 4565.404s.
+Iteration 79: PSFs for radial offset of 3.950 calculated in 4622.298s.
+Iteration 80: PSFs for radial offset of 4.000 calculated in 4679.919s.
+Iteration 81: PSFs for radial offset of 4.050 calculated in 4737.883s.
+Iteration 82: PSFs for radial offset of 4.100 calculated in 4796.348s.
+Iteration 83: PSFs for radial offset of 4.150 calculated in 4853.686s.
+Iteration 84: PSFs for radial offset of 4.200 calculated in 4912.999s.
+Iteration 85: PSFs for radial offset of 4.250 calculated in 4969.829s.
+Iteration 86: PSFs for radial offset of 4.300 calculated in 5028.123s.
+Iteration 87: PSFs for radial offset of 4.350 calculated in 5085.816s.
+Iteration 88: PSFs for radial offset of 4.400 calculated in 5144.154s.
+Iteration 89: PSFs for radial offset of 4.450 calculated in 5201.811s.
+Iteration 90: PSFs for radial offset of 4.500 calculated in 5260.374s.
+Iteration 91: PSFs for radial offset of 4.550 calculated in 5318.491s.
+Iteration 92: PSFs for radial offset of 4.600 calculated in 5377.127s.
+Iteration 93: PSFs for radial offset of 4.650 calculated in 5434.913s.
+Iteration 94: PSFs for radial offset of 4.700 calculated in 5492.388s.
+Iteration 95: PSFs for radial offset of 4.750 calculated in 5550.202s.
+Iteration 96: PSFs for radial offset of 4.800 calculated in 5609.046s.
+Iteration 97: PSFs for radial offset of 4.850 calculated in 5666.605s.
+Iteration 98: PSFs for radial offset of 4.900 calculated in 5724.068s.
+Iteration 99: PSFs for radial offset of 4.950 calculated in 5781.797s.
+Iteration 100: PSFs for radial offset of 5.000 calculated in 5839.269s.
