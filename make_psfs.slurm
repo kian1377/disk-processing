@@ -23,7 +23,7 @@
 ### REQUIRED. Set the memory required for this job.
 #SBATCH --mem=64gb
 ### REQUIRED. Specify the time required for this job, hhh:mm:ss
-#SBATCH --time=8:00:00
+#SBATCH --time=10:00:00
 
 # --------------------------------------------------------------
 ### PART 2: Executes bash commands to run your job
@@ -32,6 +32,6 @@
 cd ~/Documents/disk-processing
 conda init bash
 source ~/.bashrc
-conda activate poppy38-env
-python make_spc_wide_offset_psfs.py
+conda activate poppy39-exp-env
+python make_hlc_band1_psfs.py
 
