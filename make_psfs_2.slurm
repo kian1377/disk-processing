@@ -29,9 +29,8 @@
 ### PART 2: Executes bash commands to run your job
 # --------------------------------------------------------------
 
-cd ~/Documents/disk-processing
-conda init bash
 source ~/.bashrc
 conda activate poppy39-exp-env
-python make_hlc_band1_psfs.py
+cd ~/Documents/disk-processing
+python make_hlc_575_psfs.py
 

@@ -26,8 +26,9 @@ pixelscale_m_ref = 13e-6*u.m/u.pixel
 pixelscale_lamD_ref = 1/2
 wavelength_ref = 0.5e-6*u.m
 
-npsf = 256     
-psf_pixelscale_lamD = 0.1    
+npsf = 64
+psf_pixelscale = 13e-6
+psf_pixelscale_lamD = 500/575 * 1/2
 psf_pixelscale_mas = psf_pixelscale_lamD*mas_per_lamD/u.pix
 
 polaxis = 10
@@ -38,7 +39,7 @@ owa = 9.7
 # Create the sampling grid the PSFs will be made on
 sampling1 = 0.05
 sampling2 = 0.1
-sampling3 = 0.2
+sampling3 = 0.25
 offsets1 = np.arange(0,iwa+1,sampling1)
 offsets2 = np.arange(iwa+1,owa,sampling2)
 offsets3 = np.arange(owa,15+sampling3,sampling3)
@@ -52,36 +53,15 @@ thetas = np.arange(0,360,sampling_theta)*u.deg
 print(thetas.shape, thetas)
 
 psfs_required = len(thetas)*len(r_offsets)
-psfs_size_gb = psfs_required*(256**2)*8/1e9
-time_required = 17*len(thetas)*len(r_offsets)/3600
-print(psfs_required, psfs_size_gb, time_required)
+print(psfs_required)
 
 r_offsets_hdu = fits.PrimaryHDU(data=r_offsets)
-r_offsets_fpath = data_dir/'psfs'/'psf_radial_samples.fits'
+r_offsets_fpath = data_dir/'psfs'/'hlc_575_psfs_radial_samples.fits'
 r_offsets_hdu.writeto(r_offsets_fpath, overwrite=True)
 
 thetas_hdu = fits.PrimaryHDU(data=thetas.value)
-thetas_fpath = data_dir/'psfs'/'psf_theta_samples.fits'
+thetas_fpath = data_dir/'psfs'/'hlc_575_psfs_theta_samples.fits'
 thetas_hdu.writeto(thetas_fpath, overwrite=True)
-
-import matplotlib.pyplot as plt
-theta_offsets = []
-for r in r_offsets[1:]:
-    theta_offsets.append(thetas.to(u.radian).value)
-theta_offsets = np.array(theta_offsets)
-theta_offsets.shape
-
-fig, ax = plt.subplots(subplot_kw={'projection': 'polar'}, dpi=125)
-ax.plot(theta_offsets, r_offsets[1:], '.')
-# ax.set_rmax(2)
-ax.set_rticks([iwa, owa, 15.7])  # Less radial ticks
-ax.set_thetagrids(thetas.value)
-ax.set_rlabel_position(54)  # Move radial labels away from plotted line
-ax.grid(True)
-
-ax.set_title('Distribution of PSFs', va='bottom')
-plt.show()
-
 
 # Initialize options
 nlam = 1
@@ -130,12 +110,10 @@ for i,r in enumerate(r_offsets):
     psfs = np.abs(wfs)**2
     psf_pixelscale_m = pxscls_m[0]*u.m/u.pix
     
-    if r<r_offsets[1]: 
-        psfs_array[0] = psfs[0]
-    else: 
-        psfs_array[int( (count-1)*len(thetas) + 1 ):int( count*len(thetas) + 1 )] = psfs
+    if r<r_offsets[1]: psfs_array[0] = psfs[0]
+    else: psfs_array[int( (count-1)*len(thetas) + 1 ):int( count*len(thetas) + 1 )] = psfs
     
-    print( 'Iteration {:d}: PSFs for radial offset of {:.3f} calculated in {:.3f}s.'.format(count, r, time.time()-start) )
+    print(count, time.time()-start)
     count += 1
 
 hdr = fits.Header()
@@ -145,12 +123,16 @@ hdr['PXSCLMAS'] = psf_pixelscale_mas.value
 hdr.comments['PXSCLMAS'] = 'pixel scale in mas per pixel'
 hdr['PIXELSCL'] = psf_pixelscale_m.value
 hdr.comments['PIXELSCL'] = 'pixel scale in meters per pixel'
+hdr['CWAVELEN'] = wavelength_c.value
+hdr.comments['CWAVELEN'] = 'central wavelength in meters'
+hdr['BANDPASS'] = 0
+hdr.comments['BANDPASS'] = 'bandpass as fraction of CWAVELEN'
 hdr['POLAXIS'] = polaxis
 hdr.comments['POLAXIS'] = 'polaxis: defined by roman_phasec_proper'
 
 psfs_hdu = fits.PrimaryHDU(data=psfs_array, header=hdr)
 
-psfs_fpath = data_dir/'psfs'/'hlc_band1_polaxis{:d}_rtheta_v3.fits'.format(polaxis)
+psfs_fpath = data_dir/'psfs'/'hlc_575_psfs_072022.fits'
 psfs_hdu.writeto(psfs_fpath, overwrite=True)
 
 
