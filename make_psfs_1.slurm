@@ -23,7 +23,7 @@
 ### REQUIRED. Set the memory required for this job.
 #SBATCH --mem=64gb
 ### REQUIRED. Specify the time required for this job, hhh:mm:ss
-#SBATCH --time=10:00:00
+#SBATCH --time=24:00:00
 
 # --------------------------------------------------------------
 ### PART 2: Executes bash commands to run your job

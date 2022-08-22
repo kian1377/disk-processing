@@ -60,7 +60,7 @@ thetas_hdu = fits.PrimaryHDU(data=thetas.value)
 thetas_fpath = data_dir/'psfs'/'hlc_band1_psfs_theta_samples.fits'
 thetas_hdu.writeto(thetas_fpath, overwrite=True)
 
-nlam = 9
+nlam = 7
 lam0 = 0.575
 bandwidth = 0.1
 minlam = lam0 * (1 - bandwidth/2)
