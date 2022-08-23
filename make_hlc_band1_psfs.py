@@ -25,6 +25,7 @@ mas_per_lamD = (wavelength_c/D*u.radian).to(u.mas)
 # define desired PSF dimensions and pixelscale in units of lambda/D
 npsf = 64
 psf_pixelscale = 13e-6
+psf_pixelscale_m = 13e-6*u.m/u.pix
 psf_pixelscale_lamD = 500/575 * 1/2
 psf_pixelscale_mas = psf_pixelscale_lamD*mas_per_lamD/u.pix
 
@@ -103,7 +104,8 @@ for i,r in enumerate(r_offsets):
         if r<r_offsets[1]: 
             psfs_array[0] = psf
             break
-        else: psfs_array[count] = psf
+        else: 
+            psfs_array[count] = psf
             
         print(count, time.time()-start)
         count += 1

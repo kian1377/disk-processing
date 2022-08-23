@@ -66,13 +66,7 @@ thetas_hdu.writeto(thetas_fpath, overwrite=True)
 # Initialize options
 nlam = 1
 lam0 = 0.575
-if nlam==1:
-    lam_array = np.array([lam0])
-else:
-    bandwidth = 0.1
-    minlam = lam0 * (1 - bandwidth/2)
-    maxlam = lam0 * (1 + bandwidth/2)
-    lam_array = np.linspace( minlam, maxlam, nlam )
+lam_array = np.array([lam0])
 
 dm1 = proper.prop_fits_read( roman_phasec_proper.lib_dir + r'/examples/hlc_best_contrast_dm1.fits' )
 dm2 = proper.prop_fits_read( roman_phasec_proper.lib_dir + r'/examples/hlc_best_contrast_dm2.fits' )
