@@ -18,16 +18,15 @@ from matplotlib.patches import Circle
 
 data_dir = Path('/groups/douglase/kians-data-files/disk-processing')
 
-wavelength_c = 575e-9*u.m
+wavelength_c = 825e-9*u.m
 D = 2.3631*u.m
 mas_per_lamD = (wavelength_c/D*u.radian).to(u.mas)
 
 # define desired PSF dimensions and pixelscale in units of lambda/D
-npsf = 64
-
+npsf = 150
 # psf_pixelscale = 13e-6
 # psf_pixelscale_m = 13e-6*u.m/u.pix
-# psf_pixelscale_lamD = 500/575 * 1/2
+# psf_pixelscale_lamD = 500/825 * 1/2
 # psf_pixelscale_mas = psf_pixelscale_lamD*mas_per_lamD/u.pix
 
 psf_pixelscale_mas = 20.8*u.mas/u.pix
@@ -37,8 +36,8 @@ psf_pixelscale_m = psf_pixelscale*u.m/u.pix
 
 polaxis = 10
 
-iwa = 2.8
-owa = 9.7
+iwa = 6
+owa = 20
 
 # Create the sampling grid the PSFs will be made on
 sampling1 = psf_pixelscale_lamD/2
@@ -60,24 +59,24 @@ psfs_required = len(thetas)*len(r_offsets)
 print(psfs_required)
 
 r_offsets_hdu = fits.PrimaryHDU(data=r_offsets)
-r_offsets_fpath = data_dir/'psfs'/'hlc_band1_psfs_radial_samples_20220920.fits'
+r_offsets_fpath = data_dir/'psfs'/'spcw_band4_psfs_radial_samples.fits'
 r_offsets_hdu.writeto(r_offsets_fpath, overwrite=True)
 
 thetas_hdu = fits.PrimaryHDU(data=thetas.value)
-thetas_fpath = data_dir/'psfs'/'hlc_band1_psfs_theta_samples_20220920.fits'
+thetas_fpath = data_dir/'psfs'/'spcw_band4_psfs_theta_samples.fits'
 thetas_hdu.writeto(thetas_fpath, overwrite=True)
 
 nlam = 7
-lam0 = 0.575
+lam0 = 0.825
 bandwidth = 0.1
 minlam = lam0 * (1 - bandwidth/2)
 maxlam = lam0 * (1 + bandwidth/2)
 lam_array = np.linspace( minlam, maxlam, nlam )
 
-dm1 = proper.prop_fits_read( roman_phasec_proper.lib_dir + r'/examples/hlc_best_contrast_dm1.fits' )
-dm2 = proper.prop_fits_read( roman_phasec_proper.lib_dir + r'/examples/hlc_best_contrast_dm2.fits' )
+dm1 = proper.prop_fits_read( roman_phasec_proper.lib_dir + r'/examples/spc_wide_band4_best_contrast_dm1.fits' )
+dm2 = proper.prop_fits_read( roman_phasec_proper.lib_dir + r'/examples/spc_wide_band4_best_contrast_dm2.fits' )
 
-options = {'cor_type':'hlc', # change coronagraph type to correct band
+options = {'cor_type':'spc-wide', # change coronagraph type to correct band
            'final_sampling_lam0':psf_pixelscale_lamD, 
            'source_x_offset':0,
            'source_y_offset':0,
@@ -102,10 +101,10 @@ for i,r in enumerate(r_offsets):
         yoff = r*np.sin(th)
         options.update( {'source_x_offset':xoff.value, 'source_y_offset':yoff.value} )
     
-        (wfs, pxscls_m) = proper.prop_run_multi('roman_phasec', lam_array, npsf, QUIET=True, PASSVALUE=options)
+        (wfs, pxscls_m) = proper.prop_run_multi('roman_phasec', lam_array, 256, QUIET=True, PASSVALUE=options)
 
         psfs = np.abs(wfs)**2
-        psf = np.sum(psfs, axis=0)/nlam
+        psf = misc.pad_or_crop(np.sum(psfs, axis=0)/nlam, npsf)
         
         if r<r_offsets[1]: 
             psfs_array[0] = psf
@@ -132,6 +131,6 @@ hdr.comments['POLAXIS'] = 'polaxis: defined by roman_phasec_proper'
 
 psfs_hdu = fits.PrimaryHDU(data=psfs_array, header=hdr)
 
-psfs_fpath = data_dir/'psfs'/'hlc_band1_psfs_20220920.fits'
+psfs_fpath = data_dir/'psfs'/'hlc_band1_psfs_072022.fits'
 psfs_hdu.writeto(psfs_fpath, overwrite=True)
 

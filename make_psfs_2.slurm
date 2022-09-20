@@ -32,5 +32,5 @@
 source ~/.bashrc
 conda activate poppy39-exp-env
 cd ~/Documents/disk-processing
-python make_hlc_575_psfs.py
+python make_spcw_band4_psfs.py
 
