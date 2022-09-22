@@ -66,7 +66,7 @@ thetas_hdu = fits.PrimaryHDU(data=thetas.value)
 thetas_fpath = data_dir/'psfs'/'spcw_band4_psfs_theta_samples.fits'
 thetas_hdu.writeto(thetas_fpath, overwrite=True)
 
-nlam = 7
+nlam = 5
 lam0 = 0.825
 bandwidth = 0.1
 minlam = lam0 * (1 - bandwidth/2)
@@ -108,6 +108,7 @@ for i,r in enumerate(r_offsets):
         
         if r<r_offsets[1]: 
             psfs_array[0] = psf
+            count += 1
             break
         else: 
             psfs_array[count] = psf
@@ -131,6 +132,6 @@ hdr.comments['POLAXIS'] = 'polaxis: defined by roman_phasec_proper'
 
 psfs_hdu = fits.PrimaryHDU(data=psfs_array, header=hdr)
 
-psfs_fpath = data_dir/'psfs'/'hlc_band1_psfs_072022.fits'
+psfs_fpath = data_dir/'psfs'/'spcw_band4_psfs_20220922.fits'
 psfs_hdu.writeto(psfs_fpath, overwrite=True)
 
