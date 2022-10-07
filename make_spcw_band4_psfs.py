@@ -24,15 +24,20 @@ mas_per_lamD = (wavelength_c/D*u.radian).to(u.mas)
 
 # define desired PSF dimensions and pixelscale in units of lambda/D
 npsf = 150
-# psf_pixelscale = 13e-6
-# psf_pixelscale_m = 13e-6*u.m/u.pix
-# psf_pixelscale_lamD = 500/825 * 1/2
-# psf_pixelscale_mas = psf_pixelscale_lamD*mas_per_lamD/u.pix
+psf_pixelscale = 13e-6
+psf_pixelscale_m = 13e-6*u.m/u.pix
+psf_pixelscale_lamD = 500/825 * 1/2
+psf_pixelscale_mas = psf_pixelscale_lamD*mas_per_lamD/u.pix
 
-psf_pixelscale_mas = 20.8*u.mas/u.pix
-psf_pixelscale_lamD = psf_pixelscale_mas.value / mas_per_lamD.value
-psf_pixelscale = 13e-6 * psf_pixelscale_lamD/(1/2)
-psf_pixelscale_m = psf_pixelscale*u.m/u.pix
+# psf_pixelscale_mas = 20.8*u.mas/u.pix
+# psf_pixelscale_lamD = psf_pixelscale_mas.value / mas_per_lamD.value
+# psf_pixelscale = 13e-6 * psf_pixelscale_lamD/(1/2)
+# psf_pixelscale_m = psf_pixelscale*u.m/u.pix
+
+disk_pixelscale_mas = 20.8*u.mas/u.pix
+disk_pixelscale_lamD = psf_pixelscale_mas.value / mas_per_lamD.value
+disk_pixelscale = 13e-6 * psf_pixelscale_lamD/(1/2)
+disk_pixelscale_m = psf_pixelscale*u.m/u.pix
 
 polaxis = 10
 
@@ -40,9 +45,9 @@ iwa = 6
 owa = 20
 
 # Create the sampling grid the PSFs will be made on
-sampling1 = psf_pixelscale_lamD/2
-sampling2 = psf_pixelscale_lamD
-sampling3 = 2*psf_pixelscale_lamD
+sampling1 = psf_pixelscale_lamD/4
+sampling2 = psf_pixelscale_lamD/2
+sampling3 = psf_pixelscale_lamD
 offsets1 = np.arange(0,iwa+1,sampling1)
 offsets2 = np.arange(iwa+1,owa,sampling2)
 offsets3 = np.arange(owa,owa+5+sampling3,sampling3)
@@ -51,7 +56,7 @@ r_offsets = np.hstack([offsets1, offsets2, offsets3])
 r_offsets_mas = r_offsets*mas_per_lamD
 print(r_offsets.shape, r_offsets)
 
-sampling_theta = 15
+sampling_theta = 12
 thetas = np.arange(0,360,sampling_theta)*u.deg
 print(thetas.shape, thetas)
 
