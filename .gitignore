@@ -1,2 +1,5 @@
 # Ignore checkpoints directory
 .ipynb_checkpoints/
+
+# Ignore fits files
+*.fits
