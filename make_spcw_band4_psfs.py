@@ -34,7 +34,7 @@ psf_pixelscale_mas = psf_pixelscale_lamD*mas_per_lamD/u.pix
 # psf_pixelscale = 13e-6 * psf_pixelscale_lamD/(1/2)
 # psf_pixelscale_m = psf_pixelscale*u.m/u.pix
 
-disk_pixelscale_mas = 20.8*u.mas/u.pix
+disk_pixelscale_mas = 21.84*u.mas/u.pix
 disk_pixelscale_lamD = psf_pixelscale_mas.value / mas_per_lamD.value
 disk_pixelscale = 13e-6 * psf_pixelscale_lamD/(1/2)
 disk_pixelscale_m = psf_pixelscale*u.m/u.pix
@@ -45,18 +45,18 @@ iwa = 6
 owa = 20
 
 # Create the sampling grid the PSFs will be made on
-sampling1 = psf_pixelscale_lamD/4
-sampling2 = psf_pixelscale_lamD/2
-sampling3 = psf_pixelscale_lamD
+sampling1 = disk_pixelscale_lamD/2
+sampling2 = disk_pixelscale_lamD/2
+sampling3 = disk_pixelscale_lamD
 offsets1 = np.arange(0,iwa+1,sampling1)
 offsets2 = np.arange(iwa+1,owa,sampling2)
-offsets3 = np.arange(owa,owa+5+sampling3,sampling3)
+offsets3 = np.arange(owa,owa+6+sampling3,sampling3)
 
 r_offsets = np.hstack([offsets1, offsets2, offsets3])
 r_offsets_mas = r_offsets*mas_per_lamD
 print(r_offsets.shape, r_offsets)
 
-sampling_theta = 12
+sampling_theta = 6
 thetas = np.arange(0,360,sampling_theta)*u.deg
 print(thetas.shape, thetas)
 
@@ -64,11 +64,11 @@ psfs_required = len(thetas)*len(r_offsets)
 print(psfs_required)
 
 r_offsets_hdu = fits.PrimaryHDU(data=r_offsets)
-r_offsets_fpath = data_dir/'psfs'/'spcw_band4_psfs_radial_samples.fits'
+r_offsets_fpath = data_dir/'psfs'/'spcw_band4_psfs_radial_samples_20230224.fits'
 r_offsets_hdu.writeto(r_offsets_fpath, overwrite=True)
 
 thetas_hdu = fits.PrimaryHDU(data=thetas.value)
-thetas_fpath = data_dir/'psfs'/'spcw_band4_psfs_theta_samples.fits'
+thetas_fpath = data_dir/'psfs'/'spcw_band4_psfs_theta_samples_20230224.fits'
 thetas_hdu.writeto(thetas_fpath, overwrite=True)
 
 nlam = 5
@@ -137,6 +137,6 @@ hdr.comments['POLAXIS'] = 'polaxis: defined by roman_phasec_proper'
 
 psfs_hdu = fits.PrimaryHDU(data=psfs_array, header=hdr)
 
-psfs_fpath = data_dir/'psfs'/'spcw_band4_psfs_20220922.fits'
+psfs_fpath = data_dir/'psfs'/'spcw_band4_psfs_20230224.fits'
 psfs_hdu.writeto(psfs_fpath, overwrite=True)
 
