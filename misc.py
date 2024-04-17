@@ -194,7 +194,7 @@ def mask_psf(psf, pixelscale, pixelscale_lamD, iwa=None, owa=None):
         owa_mask = (x**2+y**2)>owa**2
         psf_masked = np.ma.masked_array(psf_masked, owa_mask)
     return psf_masked
-        
+    
 def display_dm(dm, vmax=2e-7):
     fig, ax = plt.subplots(1,1,figsize=(5,5),dpi=125)
     dm.display(opd_vmax=vmax)
@@ -219,7 +219,7 @@ def create_annular_roi_mask(npix, pixelscale, iwa, owa, side=None, offset=0, dty
     if isinstance(offset, u.Quantity): offset=offset.value
     if side=='right': dark_zone = np.ma.masked_array(dark_zone, x<offset)
     elif side=='left': dark_zone = np.ma.masked_array(dark_zone, x>offset)
-        
+    
     return dark_zone
 
 # for animations
@@ -232,7 +232,8 @@ plt.rcParams.update({'image.origin': 'lower',
                      'image.interpolation':'nearest'})
 
 def create_anim(arrs1,arrs2,lognorms=False):
-    numframes = len(times); print(numframes)
+    numframes = len(times)
+    print(numframes)
 
     # finding the maximum of all the PSFs to keep colorbar constant
     max_arrs1 = 0
