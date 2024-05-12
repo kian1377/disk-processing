@@ -24,26 +24,6 @@ from importlib import reload
 # data_dir = Path('/groups/douglase/kians-data-files/disk-processing')
 data_dir = Path('/npool/nvme/kianmilani/disk-data')
 
-pupil = fits.getdata(roman_phasec_proper.data_dir + '/hlc_20190210b/pupil.fits')
-npup = pupil.shape[0]
-# imshow1(pupil)
-
-dm1_best = fits.getdata(roman_phasec_proper.lib_dir + r'/examples/hlc_best_contrast_dm1.fits')
-dm2_best = fits.getdata(roman_phasec_proper.lib_dir + r'/examples/hlc_best_contrast_dm2.fits')
-# imshow3(dm1_best, dm2_best, dm1_best-dm2_best)
-
-wavelength_c = 575e-9*u.m
-D = 2.3631*u.m
-mas_per_lamD = (wavelength_c/D*u.radian).to(u.mas)
-
-psf_pixelscale_mas = 20.8*u.mas/u.pix
-psf_pixelscale_lamD = psf_pixelscale_mas.value / mas_per_lamD.value
-print(psf_pixelscale_lamD)
-psf_pixelscale = 13e-6 * psf_pixelscale_lamD/(1/2)
-psf_pixelscale_m = psf_pixelscale*u.m/u.pix
-
-polaxis = 2
-
 wavelength_c = 575e-9*u.m
 D = 2.3631*u.m
 mas_per_lamD = (wavelength_c/D*u.radian).to(u.mas)
@@ -52,6 +32,13 @@ npsf = 64
 psf_pixelscale = 13e-6
 psf_pixelscale_lamD = 500/575 * 1/2
 psf_pixelscale_mas = psf_pixelscale_lamD*mas_per_lamD/u.pix
+print(psf_pixelscale_lamD, psf_pixelscale_mas)
+
+polaxis = 2
+
+dm1_best = fits.getdata(roman_phasec_proper.lib_dir + r'/examples/hlc_best_contrast_dm1.fits')
+dm2_best = fits.getdata(roman_phasec_proper.lib_dir + r'/examples/hlc_best_contrast_dm2.fits')
+# imshow3(dm1_best, dm2_best, dm1_best-dm2_best)
 
 iwa = 3
 owa = 9
@@ -78,11 +65,11 @@ psfs_required = (nr-1)*nth + 1
 display(psfs_required)
 
 r_offsets_hdu = fits.PrimaryHDU(data=r_offsets)
-r_offsets_fpath = data_dir/'psfs'/'hlc_band1_psfs_radial_samples_20240418.fits'
+r_offsets_fpath = data_dir/'psfs'/f'hlc_band1_radial_samples_polaxis{polaxis:d}_may2024.fits'
 r_offsets_hdu.writeto(r_offsets_fpath, overwrite=True)
 
 thetas_hdu = fits.PrimaryHDU(data=thetas.value)
-thetas_fpath = data_dir/'psfs'/'hlc_band1_psfs_theta_samples_20240418.fits'
+thetas_fpath = data_dir/'psfs'/f'hlc_band1_radial_samples_polaxis{polaxis:d}_may2024.fits'
 thetas_hdu.writeto(thetas_fpath, overwrite=True)
 
 # Plotting field angles
@@ -129,13 +116,25 @@ options = {'cor_type':'hlc', # change coronagraph type to correct band
            'polaxis':polaxis,   
           }
 
+psfs_fpath = data_dir/'psfs'/f'hlc_band1_psfs_polaxis{polaxis:d}_may2024.fits'
+
+hdr = fits.Header()
+hdr['PXSCLAMD'] = psf_pixelscale_lamD
+hdr.comments['PXSCLAMD'] = 'pixel scale in lam0/D per pixel'
+hdr['PXSCLMAS'] = psf_pixelscale_mas.value
+hdr.comments['PXSCLMAS'] = 'pixel scale in mas per pixel'
+# hdr['PIXELSCL'] = psf_pixelscale
+# hdr.comments['PIXELSCL'] = 'pixel scale in meters per pixel'
+hdr['CWAVELEN'] = wavelength_c.to_value(u.m)
+hdr.comments['CWAVELEN'] = 'central wavelength in meters'
+hdr['BANDPASS'] = bandwidth
+hdr.comments['BANDPASS'] = 'bandpass as fraction of CWAVELEN'
+
 psfs_array = np.zeros( shape=( (len(r_offsets)-1)*len(thetas) + 1, npsf,npsf) )
 
 count = 0
 start = time.time()
 for i,r in enumerate(r_offsets): 
-    # if i==1:
-    #     break
     for j,th in enumerate(thetas):
         xoff = r*np.cos(th)
         yoff = r*np.sin(th)
@@ -155,24 +154,9 @@ for i,r in enumerate(r_offsets):
 
         if r<r_offsets[1]: 
             break # skip first set of PSFs if radial offset is 0 at the start
-        
 
-hdr = fits.Header()
-hdr['PXSCLAMD'] = psf_pixelscale_lamD
-hdr.comments['PXSCLAMD'] = 'pixel scale in lam0/D per pixel'
-hdr['PXSCLMAS'] = psf_pixelscale_mas.value
-hdr.comments['PXSCLMAS'] = 'pixel scale in mas per pixel'
-hdr['PIXELSCL'] = psf_pixelscale
-hdr.comments['PIXELSCL'] = 'pixel scale in meters per pixel'
-hdr['CWAVELEN'] = wavelength_c.to_value(u.m)
-hdr.comments['CWAVELEN'] = 'central wavelength in meters'
-hdr['BANDPASS'] = bandwidth
-hdr.comments['BANDPASS'] = 'bandpass as fraction of CWAVELEN'
+        psfs_hdu = fits.PrimaryHDU(data=psfs_array, header=hdr)
+        psfs_hdu.writeto(psfs_fpath, overwrite=True)
+        print('Saved data to path ', str(psfs_fpath))
 
-psfs_hdu = fits.PrimaryHDU(data=psfs_array, header=hdr)
-
-psfs_fpath = data_dir/'psfs'/f'hlc_band1_psfs_polaxis{polaxis:d}_20240418.fits'
-psfs_hdu.writeto(psfs_fpath, overwrite=True)
-print('Saved data to path ', str(psfs_fpath))
-# make_hlc_band1_psfs_20240418.py
 
