@@ -24,22 +24,20 @@ from importlib import reload
 # data_dir = Path('/groups/douglase/kians-data-files/disk-processing')
 data_dir = Path('/npool/nvme/kianmilani/disk-data')
 
-dm1_best = fits.getdata(roman_phasec_proper.lib_dir + r'/examples/spc_wide_band4_best_contrast_dm1.fits')
-dm2_best = fits.getdata(roman_phasec_proper.lib_dir + r'/examples/spc_wide_band4_best_contrast_dm2.fits')
-# imshow3(dm1_best, dm2_best, dm1_best-dm2_best)
-# 3681736
-# 3681982
-
 wavelength_c = 825e-9*u.m
 D = 2.3631*u.m
 mas_per_lamD = (wavelength_c/D*u.radian).to(u.mas)
 
 npsf = 256
-psf_pixelscale_mas = 21.84*u.mas/u.pix
-psf_pixelscale_lamD = psf_pixelscale_mas.value / mas_per_lamD.value
-print(psf_pixelscale_lamD)
+psf_pixelscale = 13e-6
+psf_pixelscale_lamD = 500/825 * 1/2
+psf_pixelscale_mas = psf_pixelscale_lamD*mas_per_lamD/u.pix
+print(psf_pixelscale_lamD, psf_pixelscale_mas)
 
 polaxis = -1
+
+dm1_best = fits.getdata(roman_phasec_proper.lib_dir + r'/examples/spc_wide_band4_best_contrast_dm1.fits')
+dm2_best = fits.getdata(roman_phasec_proper.lib_dir + r'/examples/spc_wide_band4_best_contrast_dm2.fits')
 
 iwa = 6
 owa = 20
@@ -59,7 +57,7 @@ nr = len(r_offsets)
 r_offsets_mas = r_offsets*mas_per_lamD
 # display(nr, r_offsets)
 
-sampling_theta = 20
+sampling_theta = 15
 thetas = np.arange(0,360,sampling_theta)*u.deg
 nth = len(thetas)
 # display(nth, thetas)
@@ -159,12 +157,5 @@ for i,r in enumerate(r_offsets):
         psfs_hdu = fits.PrimaryHDU(data=psfs_array, header=hdr)
         psfs_hdu.writeto(psfs_fpath, overwrite=True)
         print('Saved data to path ', str(psfs_fpath))
-        
 
-# psfs_hdu = fits.PrimaryHDU(data=psfs_array, header=hdr)
-
-# psfs_fpath = data_dir/'psfs'/f'spc_band4_psfs_polaxis{polaxis:d}_20240418.fits'
-# psfs_hdu.writeto(psfs_fpath, overwrite=True)
-# print('Saved data to path ', str(psfs_fpath))
-# make_hlc_band1_psfs_20240418.py
-
+# nohup-python make_spc_band4_psfs_20240418.py make_psfs_spc_-2.out
